@@ -22,14 +22,14 @@ func scrapeSinglePage(url string, c *colly.Collector) []quote {
 	c.OnHTML("div.col-md-8", func(e *colly.HTMLElement) {
 		e.ForEach("div.quote", func(i int, element *colly.HTMLElement) {
 			var quote quote
-			element.ForEach("span.text", func(_ int, elem *colly.HTMLElement) {
-				quote.text = elem.Text
+			element.ForEach("span.text", func(_ int, quoteText *colly.HTMLElement) {
+				quote.text = quoteText.Text
 			})
-			element.ForEach("small.author", func(_ int, elem *colly.HTMLElement) {
-				quote.author = elem.Text
+			element.ForEach("small.author", func(_ int, author *colly.HTMLElement) {
+				quote.author = author.Text
 			})
-			element.ForEach("div.tags", func(_ int, elem *colly.HTMLElement) {
-				elem.ForEach("a.tag", func(_ int, tag *colly.HTMLElement) {
+			element.ForEach("div.tags", func(_ int, tagContainer *colly.HTMLElement) {
+				tagContainer.ForEach("a.tag", func(_ int, tag *colly.HTMLElement) {
 					quote.tags = append(quote.tags, tag.Text)
 				})
 			})
@@ -66,7 +66,7 @@ func main() {
 	}(file)
 
 	if err != nil {
-		log.Fatal("Error while creating a file")
+		log.Fatal(err)
 	}
 
 	csvWriter := csv.NewWriter(file)
